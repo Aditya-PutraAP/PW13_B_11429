@@ -1,11 +1,41 @@
 import { useEffect, useState } from "react";
-import { Alert, Col, Container, Row, Spinner, Stack } from "react-bootstrap";
+import {
+  Alert,
+  Col,
+  Container,
+  Row,
+  Spinner,
+  Stack,
+  Button,
+} from "react-bootstrap";
 import { GetAllContents } from "../api/apiContent";
+import { CreateWatchLater } from "../api/apiWatchLater";
 import { getThumbnail } from "../api";
+import { toast } from "react-toastify";
+import { FaStopwatch } from "react-icons/fa";
 
 const DashboardPage = () => {
   const [contents, setContents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+
+  const submitData = (contentId) => {
+    setIsPending(true);
+
+    const formData = new FormData();
+    formData.append("id_content", contentId);
+
+    CreateWatchLater(formData)
+      .then((response) => {
+        setIsPending(false);
+        toast.success(response.message);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsPending(false);
+        toast.warning(JSON.stringify(err.message));
+      });
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -18,6 +48,7 @@ const DashboardPage = () => {
         console.log(err);
       });
   }, []);
+
   return (
     <Container className="mt-4">
       <Stack direction="horizontal" gap={3} className="mb-3">
@@ -50,8 +81,23 @@ const DashboardPage = () => {
                   alt="..."
                 />
                 <div className="card-body">
-                  <h5 className="card-title text-truncate">{content.title}</h5>
-                  <p className="card-text">{content.description}</p>
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h5 className="card-title text-truncate">
+                        {content.title}
+                      </h5>
+                      <p className="card-text">{content.description}</p>
+                    </div>
+                  </div>
+                  <div className="text-end">
+                    <Button
+                      onClick={() => submitData(content.id)}
+                      disabled={isPending}
+                      variant="success"
+                    >
+                      <FaStopwatch />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Col>
@@ -65,4 +111,5 @@ const DashboardPage = () => {
     </Container>
   );
 };
+
 export default DashboardPage;

@@ -29,4 +29,8 @@ Route::middleware('auth:api')->group(function(){
     Route::delete('/contents/{id}',[App\Http\Controllers\Api\ContentController::class,'destroy']);
 
     Route::get('/contents/user/{id}',[App\Http\Controllers\Api\ContentController::class,'showContentbyUser']);
+
+    Route::post('/watchlater',[App\Http\Controllers\Api\WatchLaterController::class,'store']);
+    Route::get('/watchlater',[App\Http\Controllers\Api\WatchLaterController::class,'index']);
+    Route::delete('/watchlater/{id}',[App\Http\Controllers\Api\WatchLaterController::class,'destroy']);
 });
