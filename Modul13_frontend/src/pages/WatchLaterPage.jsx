@@ -7,6 +7,7 @@ import {
   Col,
   Button,
   Modal,
+  Dropdown,
 } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
@@ -18,6 +19,9 @@ const WatchLaterPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [idWatchLater, setIdWatchLater] = useState(null);
+  const [selectedFilter, setSelectedFilter] = useState(
+    "Semua video watch later"
+  );
 
   const handleDeleteClick = (id) => {
     setIdWatchLater(id);
@@ -27,6 +31,15 @@ const WatchLaterPage = () => {
   const handleDeleteConfirmed = () => {
     setShowModal(false);
     deleteWatchLater(idWatchLater);
+  };
+
+  const formatDate = (dateString) => {
+    const dateObject = new Date(dateString);
+    const year = dateObject.getFullYear();
+    const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObject.getDate()).padStart(2, '0'); 
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
   };
 
   const deleteWatchLater = (id) => {
@@ -43,9 +56,9 @@ const WatchLaterPage = () => {
       });
   };
 
-  const fetchWatchLater = async () => {
+  const fetchWatchLater = async (id) => {
     setIsLoading(true);
-    GetAllWatchLater()
+    GetAllWatchLater(id)
       .then((response) => {
         setWatchLater(response);
         setIsLoading(false);
@@ -57,24 +70,41 @@ const WatchLaterPage = () => {
   };
 
   useEffect(() => {
-    fetchWatchLater();
-  }, []);
-
-  const formatDate = (dateString) => {
-    const dateObject = new Date(dateString);
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObject.getDate()).padStart(2, '0'); 
-    const formattedDate = `${year}-${month}-${day}`;
-    return formattedDate;
-  };
+    fetchWatchLater(selectedFilter);
+  }, [selectedFilter]);
 
   return (
     <Container className="mt-4">
       <Row>
-        <Col>
+        <Col xs={9} style={{ flex: '0 0 78%' }}>
           <h1 className="h4 fw-bold mb-0 text-nowrap">Watch Later Videos</h1>
           <hr className="border-top border-light opacity-50 w-100" />
+        </Col>
+        <Col>
+          <Dropdown className="mt-4">
+            <Dropdown.Toggle className="text-start" variant="dark"  style={{  width:"250px" }}>
+              {selectedFilter}
+            </Dropdown.Toggle>
+            <Dropdown.Menu >
+              <Dropdown.Item
+                onClick={() => setSelectedFilter("Semua video watch later")}
+              >
+                Semua video watch later
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSelectedFilter("Hari ini")}>
+                Hari ini
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSelectedFilter("Kemarin")}>
+                Kemarin
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSelectedFilter("Bulan ini")}>
+                Bulan ini
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSelectedFilter("Tahun ini")}>
+                Tahun ini
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         </Col>
       </Row>
       {isLoading ? (
@@ -136,7 +166,7 @@ const WatchLaterPage = () => {
           ))}
         </>
       ) : (
-        <Alert variant="dark" className="text-center">
+        <Alert variant="dark" className="text-center mt-3">
           Belum ada video di Watch Later, yuk tambah Video!
         </Alert>
       )}

@@ -1,10 +1,9 @@
 import useAxios from ".";
 
 //Mendapatkan semua watch later
-export const GetAllWatchLater = async () => {
-    const id = JSON.parse(sessionStorage.getItem("user")).id;
+export const GetAllWatchLater = async (data) => {
     try {
-        const response = await useAxios.get("/watchlater", {
+        const response = await useAxios.get(`/watchlater/${data}`, {
             headers: {
                 "Content-Type" : "application/json",
                 Authorization: `Bearer ${sessionStorage.getItem("token")}`,

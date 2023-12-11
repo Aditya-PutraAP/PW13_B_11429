@@ -16,15 +16,9 @@ class WatchLaterController extends Controller
      */
     public function index()
     {
-        $watchLater = WatchLater::where('id_user', Auth::user()->id)->get()->load('content');
-        return response()->json(
-            [
-              'message' => 'All Watch Later Retrieved',
-              'data' => $watchLater,
-            ],
-            200
-          );
+        
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -71,9 +65,42 @@ class WatchLaterController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show( $data)
     {
-        //
+        $userId = Auth::user()->id;
+
+        if($data === "Semua video watch later"){
+            $watchLater = WatchLater::where('id_user', $userId)->get()->load('content');
+        } elseif($data === "Hari ini"){
+            $watchLater = WatchLater::where('id_user', $userId)
+            ->whereDate('data_added', today())
+            ->get()
+            ->load('content');
+        } elseif($data === "Kemarin"){
+            $watchLater = WatchLater::where('id_user', $userId)
+            ->whereDate('data_added', today()->subDays(1))
+            ->get()
+            ->load('content');
+        } elseif($data === "Bulan ini"){
+            $watchLater = WatchLater::where('id_user', $userId)
+            ->whereMonth('data_added', today())
+            ->whereYear('data_added', today())
+            ->get()
+            ->load('content');
+        }elseif($data === "Tahun ini"){
+            $watchLater = WatchLater::where('id_user', $userId)
+            ->whereYear('data_added', today())
+            ->get()
+            ->load('content');
+        }
+
+        return response()->json(
+            [
+                'message' => 'Watch Later Retrieved',
+                'data' => $watchLater,
+            ],
+            200
+        );
     }
 
     /**
